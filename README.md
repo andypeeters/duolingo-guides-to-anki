@@ -44,8 +44,8 @@ to make the scripts executable:
 
 The following software must be available on your computer to be able to run the scripts:
 
-- Bash shell
-- Python 3
+- Bash shell, and the wget tool.
+- Python 3.
 
 ## Usage
 
