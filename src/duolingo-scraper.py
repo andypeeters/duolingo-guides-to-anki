@@ -14,6 +14,12 @@
 # along with this program, see LICENSE.
 # If not, see <https://www.gnu.org/licenses/gpl-3.0.txt>.
 
+import argparse
+
 # Main program starts here.
 if __name__ == '__main__':
-    print("Hello, world!")
+    parser = argparse.ArgumentParser("duolingo-scraper", description='Extracts example sentences from Duolingo guides and converts it to Anki cards.')
+    parser.add_argument("guide_file", help="Duolingo Guide file in HTML format.", type=argparse.FileType('r', encoding='latin-1'))
+    args = parser.parse_args()
+
+    print(args.guide_file.name)

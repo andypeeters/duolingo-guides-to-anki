@@ -11,6 +11,14 @@
             "program": "${file}",
             "console": "integratedTerminal",
             "justMyCode": true
+        },
+        {
+            "name": "Python: Current File with parameters",
+            "type": "python",
+            "request": "launch",
+            "program": "${file} guidefile.html",
+            "console": "integratedTerminal",
+            "justMyCode": true
         }
     ]
 }
