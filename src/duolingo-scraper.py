@@ -15,6 +15,13 @@
 # If not, see <https://www.gnu.org/licenses/gpl-3.0.txt>.
 
 import argparse
+from bs4 import BeautifulSoup
+
+def parse_guidefile(guidefile):
+    print("Parsing file:", guidefile.name)
+
+    with open(guidefile.name) as fp:
+        soup = BeautifulSoup(fp, "html.parser")
 
 # Main program starts here.
 if __name__ == '__main__':
@@ -22,4 +29,4 @@ if __name__ == '__main__':
     parser.add_argument("guide_file", help="Duolingo Guide file in HTML format.", type=argparse.FileType('r', encoding='latin-1'))
     args = parser.parse_args()
 
-    print(args.guide_file.name)
+    parse_guidefile(args.guide_file)
