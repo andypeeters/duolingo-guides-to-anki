@@ -27,7 +27,7 @@ and platform, and broaden your horizon in tech is never really a bad thing.
 At the moment there are 2 scripts:
 
 1. **duolingo-download.sh** is used to download the audio of each example sentence.
-2. **duolingo-scraper.py** extracts the examples sentences and converts the data into a CSV file.
+2. **duolingo_scraper.py** extracts the examples sentences and converts the data into a CSV file.
 
 ### Limitations
 
