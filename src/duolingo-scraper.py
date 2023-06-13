@@ -23,10 +23,17 @@ def parse_guidefile(guidefile):
     with open(guidefile.name) as fp:
         soup = BeautifulSoup(fp, "html.parser")
 
+    return soup
+
+def extract_document_title(soup: BeautifulSoup):
+    print("Extracting the guide's title")
+    print(soup.title)
+
 # Main program starts here.
 if __name__ == '__main__':
     parser = argparse.ArgumentParser("duolingo-scraper", description='Extracts example sentences from Duolingo guides and converts it to Anki cards.')
     parser.add_argument("guide_file", help="Duolingo Guide file in HTML format.", type=argparse.FileType('r', encoding='latin-1'))
     args = parser.parse_args()
 
-    parse_guidefile(args.guide_file)
+    soup = parse_guidefile(args.guide_file)
+    extract_document_title(soup)
