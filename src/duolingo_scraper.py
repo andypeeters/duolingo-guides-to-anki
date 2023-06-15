@@ -26,8 +26,9 @@ def parse_guidefile(guidefile):
     return soup
 
 def extract_document_title(soup: BeautifulSoup):
-    print("Extracting the guide's title")
-    print(soup.title)
+    title = soup.head.title.get_text()
+    print("Extracting the guide's title:", title)
+    return title
 
 # Main program starts here.
 if __name__ == '__main__':
@@ -36,4 +37,4 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     soup = parse_guidefile(args.guide_file)
-    extract_document_title(soup)
+    document_title = extract_document_title(soup)

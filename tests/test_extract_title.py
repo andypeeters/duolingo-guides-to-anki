@@ -14,12 +14,21 @@
 # along with this program, see LICENSE.
 # If not, see <https://www.gnu.org/licenses/gpl-3.0.txt>.
 
+from bs4 import BeautifulSoup
 import unittest
-from ..src import duolingo_scraper
+
+import os
+import sys
+script_dir = os.path.dirname( __file__ )
+module_dir = os.path.join(script_dir, '..', 'src')
+sys.path.append(module_dir)
+
+import duolingo_scraper as scraper
 
 class Test_TestHtmlExtration(unittest.TestCase):
     def test_extract_title(self):
-        self.assertEqual(duolingo_scraper.extract_document_title(), 4)
+        soup = BeautifulSoup('<html><head><title>Basic title</title></head><body>No body.</body></html>', 'html.parser')
+        self.assertEqual(scraper.extract_document_title(soup), 'Basic title')
 
 if __name__ == '__main__':
     unittest.main()
