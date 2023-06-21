@@ -40,8 +40,14 @@ def extract_document_guide_title(soup: BeautifulSoup):
 
 def search_for_key_phrase_blocks(soup: BeautifulSoup):
     print("Searching for the key phrases blocks...")
-    searchtext = re.compile('KEY PHRASES')
+    searchtext = re.compile('KEY(.*)PHRASES', re.DOTALL)
     parents = soup.body.find_all('div', class_='_1WCLL')
+
+    for tag in parents:
+        child = tag.find('span', string=searchtext)
+        if child:
+            print(child)
+
     # TODO: finish function.
 
 # Main program starts here.
