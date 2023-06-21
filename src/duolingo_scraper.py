@@ -16,6 +16,7 @@
 
 import argparse
 from bs4 import BeautifulSoup
+import re
 
 def parse_guidefile(guidefile):
     print("Parsing file:", guidefile.name)
@@ -25,10 +26,23 @@ def parse_guidefile(guidefile):
 
     return soup
 
+# HACK: Temporary test function, may be removed later.
 def extract_document_title(soup: BeautifulSoup):
     title = soup.head.title.get_text()
     print("Extracting the guide's title:", title)
     return title
+
+def extract_document_guide_title(soup: BeautifulSoup):
+    print("Extracting the guide's title...")
+    items = soup.body.find_all('div', class_='_3LqTo')
+
+    return items[0].get_text() if items else None
+
+def search_for_key_phrase_blocks(soup: BeautifulSoup):
+    print("Searching for the key phrases blocks...")
+    searchtext = re.compile('KEY PHRASES')
+    parents = soup.body.find_all('div', class_='_1WCLL')
+    # TODO: finish function.
 
 # Main program starts here.
 if __name__ == '__main__':
@@ -37,4 +51,9 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     soup = parse_guidefile(args.guide_file)
-    document_title = extract_document_title(soup)
+    guide_title = extract_document_guide_title(soup)
+
+    search_for_key_phrase_blocks(soup)
+
+    if (guide_title):
+        print(guide_title)
