@@ -55,5 +55,5 @@ if __name__ == '__main__':
 
     search_for_key_phrase_blocks(soup)
 
-    if (guide_title):
+    if guide_title:
         print(guide_title)
