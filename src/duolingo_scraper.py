@@ -38,12 +38,35 @@ def extract_document_guide_title(soup: BeautifulSoup):
 
     return items[0].get_text() if items else None
 
-def extract_category_title(soup: BeautifulSoup, keyPhrasesStartTag):
+def extract_category_title(keyPhrasesStartTag):
     print("Extracting category titles from the key phrases blocks...")
-    category_title_tag = keyPhrasesStartTag.next_sibling.next_sibling
-    if category_title_tag:
-        title = category_title_tag.span.span.get_text()
-        return title
+    title = keyPhrasesStartTag.span.span.get_text()
+    return title
+
+def extract_sentence(startTag):
+    print("Extracing sentences from phrase block...")
+    possible_sentence_tag = startTag;
+
+    while possible_sentence_tag != None:
+        possible_sentence_tag = possible_sentence_tag.next_sibling
+        if possible_sentence_tag is None:
+            break
+        
+        possible_sentence_tag = possible_sentence_tag.next_sibling
+        if possible_sentence_tag is None:
+            break
+
+        sentence_block_tag = possible_sentence_tag.div
+        if sentence_block_tag is None:
+            break
+
+        sentence_tag = sentence_block_tag.find('div', class_='ZBgAa')
+        if sentence_tag:
+            print(sentence_tag.span.span.get_text())
+
+        translation_tag = sentence_block_tag.find('div', class_='_1F4vM')
+        if translation_tag:
+            print(translation_tag.span.span.get_text())
 
 def search_for_key_phrase_blocks(soup: BeautifulSoup):
     print("Searching for the key phrases blocks...")
@@ -53,8 +76,11 @@ def search_for_key_phrase_blocks(soup: BeautifulSoup):
     for tag in parents:
         child = tag.find('span', string=searchtext)
         if child:
-            category_title = extract_category_title(soup, tag)
+            category_tag = tag.next_sibling.next_sibling
+            category_title = extract_category_title(category_tag)
             print(category_title)
+
+            extract_sentence(category_tag)
 
 # Main program starts here.
 if __name__ == '__main__':
