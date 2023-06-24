@@ -17,6 +17,7 @@
 import argparse
 from bs4 import BeautifulSoup
 import re
+import csv
 
 def parse_guidefile(guidefile):
     print("Parsing file:", guidefile.name)
@@ -25,12 +26,6 @@ def parse_guidefile(guidefile):
         soup = BeautifulSoup(fp, "html.parser")
 
     return soup
-
-# HACK: Temporary test function, may be removed later.
-def extract_document_title(soup: BeautifulSoup):
-    title = soup.head.title.get_text()
-    print("Extracting the guide's title:", title)
-    return title
 
 def extract_document_guide_title(soup: BeautifulSoup):
     print("Extracting the guide's title...")
@@ -43,10 +38,11 @@ def extract_category_title(keyPhrasesStartTag):
     title = keyPhrasesStartTag.span.span.get_text()
     return title
 
-def extract_sentence(startTag):
+def extract_sentence(writer, startTag, category_name: str):
     print("Extracing sentences from phrase block...")
     possible_sentence_tag = startTag;
 
+    # TODO: adapt the loop condition so that no multiple records of the same line are written.
     while possible_sentence_tag != None:
         possible_sentence_tag = possible_sentence_tag.next_sibling
         if possible_sentence_tag is None:
@@ -62,25 +58,29 @@ def extract_sentence(startTag):
 
         sentence_tag = sentence_block_tag.find('div', class_='ZBgAa')
         if sentence_tag:
-            print(sentence_tag.span.span.get_text())
+            sentence = sentence_tag.span.span.get_text()
 
         translation_tag = sentence_block_tag.find('div', class_='_1F4vM')
         if translation_tag:
-            print(translation_tag.span.span.get_text())
+            translation = translation_tag.span.span.get_text()
+    
+        data_line = [sentence, translation, 'mp3', '[sound:mp3]', 0, category_name]
+        writer.writerow(data_line)
 
-def search_for_key_phrase_blocks(soup: BeautifulSoup):
+def search_for_key_phrase_blocks(soup: BeautifulSoup, output_file_name: str):
     print("Searching for the key phrases blocks...")
     searchtext = re.compile('KEY(.*)PHRASES', re.DOTALL)
     parents = soup.body.find_all('div', class_='_1WCLL')
 
-    for tag in parents:
-        child = tag.find('span', string=searchtext)
-        if child:
-            category_tag = tag.next_sibling.next_sibling
-            category_title = extract_category_title(category_tag)
-            print(category_title)
+    with open(output_file_name, 'w', encoding='UTF8') as csv_file:
+        writer = csv.writer(csv_file, dialect='excel', delimiter='\t')
 
-            extract_sentence(category_tag)
+        for tag in parents:
+            child = tag.find('span', string=searchtext)
+            if child:
+                category_tag = tag.next_sibling.next_sibling
+                category_title = extract_category_title(category_tag)
+                extract_sentence(writer, category_tag, category_title)
 
 # Main program starts here.
 if __name__ == '__main__':
@@ -91,6 +91,8 @@ if __name__ == '__main__':
     soup = parse_guidefile(args.guide_file)
     guide_title = extract_document_guide_title(soup)
     if guide_title:
-        print(guide_title)
-
-    search_for_key_phrase_blocks(soup)
+        print('Processing:', guide_title)
+        output_file_name = guide_title.replace(' ', '_') + '.csv'
+        search_for_key_phrase_blocks(soup, output_file_name)
+    else:
+        print('No proper title was found, this might mean that the file hasn\'t the expected structure.')
