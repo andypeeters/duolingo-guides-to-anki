@@ -38,6 +38,13 @@ def extract_document_guide_title(soup: BeautifulSoup):
 
     return items[0].get_text() if items else None
 
+def extract_category_title(soup: BeautifulSoup, keyPhrasesStartTag):
+    print("Extracting category titles from the key phrases blocks...")
+    category_title_tag = keyPhrasesStartTag.next_sibling.next_sibling
+    if category_title_tag:
+        title = category_title_tag.span.span.get_text()
+        return title
+
 def search_for_key_phrase_blocks(soup: BeautifulSoup):
     print("Searching for the key phrases blocks...")
     searchtext = re.compile('KEY(.*)PHRASES', re.DOTALL)
@@ -46,9 +53,8 @@ def search_for_key_phrase_blocks(soup: BeautifulSoup):
     for tag in parents:
         child = tag.find('span', string=searchtext)
         if child:
-            print(child)
-
-    # TODO: finish function.
+            category_title = extract_category_title(soup, tag)
+            print(category_title)
 
 # Main program starts here.
 if __name__ == '__main__':
@@ -58,8 +64,7 @@ if __name__ == '__main__':
 
     soup = parse_guidefile(args.guide_file)
     guide_title = extract_document_guide_title(soup)
-
-    search_for_key_phrase_blocks(soup)
-
     if guide_title:
         print(guide_title)
+
+    search_for_key_phrase_blocks(soup)
