@@ -42,7 +42,6 @@ def extract_sentence(writer, startTag, category_name: str):
     print("Extracing sentences from phrase block...")
     possible_sentence_tag = startTag;
 
-    # TODO: adapt the loop condition so that no multiple records of the same line are written.
     while possible_sentence_tag != None:
         possible_sentence_tag = possible_sentence_tag.next_sibling
         if possible_sentence_tag is None:
@@ -59,6 +58,9 @@ def extract_sentence(writer, startTag, category_name: str):
         sentence_tag = sentence_block_tag.find('div', class_='ZBgAa')
         if sentence_tag:
             sentence = sentence_tag.span.span.get_text()
+        else:
+            # End further processing of the block as no sentence value is present.
+            break
 
         translation_tag = sentence_block_tag.find('div', class_='_1F4vM')
         if translation_tag:
