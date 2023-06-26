@@ -33,12 +33,15 @@ def extract_document_guide_title(soup: BeautifulSoup):
 
     return items[0].get_text() if items else None
 
+def extract_guide_number(guide_title: str):
+    return re.search(r'Unit (\d+) Guidebook', guide_title).group(1)
+
 def extract_category_title(keyPhrasesStartTag):
     print("Extracting category titles from the key phrases blocks...")
     title = keyPhrasesStartTag.span.span.get_text()
     return title
 
-def extract_sentence(writer, startTag, category_name: str):
+def extract_sentence(writer, startTag, category_name: str, guide_number: str):
     print("Extracing sentences from phrase block...")
     possible_sentence_tag = startTag;
 
@@ -66,10 +69,10 @@ def extract_sentence(writer, startTag, category_name: str):
         if translation_tag:
             translation = translation_tag.span.span.get_text()
     
-        data_line = [sentence, translation, 'mp3', '[sound:mp3]', 0, category_name]
+        data_line = [sentence, translation, 'mp3', '[sound:mp3]', guide_number, category_name]
         writer.writerow(data_line)
 
-def search_for_key_phrase_blocks(soup: BeautifulSoup, output_file_name: str):
+def search_for_key_phrase_blocks(soup: BeautifulSoup, output_file_name: str, guide_number: str):
     print("Searching for the key phrases blocks...")
     searchtext = re.compile('KEY(.*)PHRASES', re.DOTALL)
     parents = soup.body.find_all('div', class_='_1WCLL')
@@ -82,7 +85,7 @@ def search_for_key_phrase_blocks(soup: BeautifulSoup, output_file_name: str):
             if child:
                 category_tag = tag.next_sibling.next_sibling
                 category_title = extract_category_title(category_tag)
-                extract_sentence(writer, category_tag, category_title)
+                extract_sentence(writer, category_tag, category_title, guide_number)
 
 # Main program starts here.
 if __name__ == '__main__':
@@ -94,7 +97,8 @@ if __name__ == '__main__':
     guide_title = extract_document_guide_title(soup)
     if guide_title:
         print('Processing:', guide_title)
+        guide_number = extract_guide_number(guide_title)
         output_file_name = guide_title.replace(' ', '_') + '.csv'
-        search_for_key_phrase_blocks(soup, output_file_name)
+        search_for_key_phrase_blocks(soup, output_file_name, guide_number)
     else:
         print('No proper title was found, this might mean that the file hasn\'t the expected structure.')
