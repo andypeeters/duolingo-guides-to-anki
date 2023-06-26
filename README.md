@@ -38,7 +38,7 @@ At the moment there are 2 scripts:
 Just copy the scripts into a directory of your choice. And in case of Linux/Unix execute the following command
 to make the scripts executable:
 
-`chmod u+x duolingo-download.sh duolingo-scraper.py`
+`chmod u+x duolingo-download.sh duolingo_scraper.py`
 
 ### Requirements
 
