@@ -29,9 +29,30 @@ At the moment there are 2 scripts:
 1. **duolingo-download.sh** is used to download the audio of each example sentence.
 2. **duolingo_scraper.py** extracts the examples sentences and converts the data into a CSV file.
 
+### CSV File Format
+
+Every line in the CSV file has the following structure:
+
+1. The original sentence (in the language being learned)
+2. The translated sentence (in the language of the UI)
+3. Fixed value 'mp3'. Placeholder value for later use.
+4. Fixed value '[sound:mp3]'. Another placeholder value for later use.
+5. The guide number.
+6. The title of the example sentence block.
+
+Each field is separated by tabs.
+
 ### Limitations
 
-(still to add)
+First and foremost: the code of the python script is not so good, to say the least, to not to say it is kind of
+crap. But it works for what it needs to do. I have the intention to improve the code quality but that will be for
+later versions.
+
+The scraper cannot download the audio files. That's why a separate script is needed. Additionally, to let the scraper
+do its job, it needs a local copy of the guide. In other words, it is necessary to save a Duolingo guide to local
+disk first, and then run the scraper on that file.
+
+Next versions of the script(s) will attempt to remove these limitations.
 
 ## Installation
 
@@ -49,7 +70,20 @@ The following software must be available on your computer to be able to run the 
 
 ## Usage
 
-(still to add)
+1. First, open Duolingo in a browser, open the guide and save it to local disk. It is not needed to save all files,
+   just the main HTML page is sufficient.
+2. Open up a terminal window.
+3. Run the scraper with the following command: `python duolingo_scraper.py /path/to/local-file.html`
+4. Go back to the brower, open up the developer tools by pressing F12 and select the **Network** tab.
+5. Click the play icon of an example sentence, look up the corresponding URL in the Developer tools **Network** tab
+   and copy it to the clipboard.
+6. Go back to the terminal and type the following command `duolingo-download.sh`, leave a space and paste in the copied
+   URL. Press Enter and the audio file is being downloaded to disk.
+7. Take the local file name of the audio file and copy it into one of the placeholder field of the generated CSV file.
+8. Repeat steps 5 to 7 for each remaining audio file.
+
+After completing all steps, import the CSV file into Anki and move all audio files the media collection of the Anki
+profile.
 
 ## How to Contribute
 
@@ -60,4 +94,8 @@ comment or remark. Or just to start a conversation about the project.
 
 GNU General Public License v3.0 or later
 
-See `LICENSE <LICENSE>`_ to see the full text.
+See **LICENSE** to see the full text.
+
+## Changelog
+
+v1.0.0: first packaged release.
