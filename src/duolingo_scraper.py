@@ -36,41 +36,87 @@ def extract_document_guide_title(soup: BeautifulSoup):
 def extract_guide_number(guide_title: str):
     return re.search(r'Unit (\d+) Guidebook', guide_title).group(1)
 
+def remove_newline_and_duplicate_spaces(textToClean: str):
+    textToClean = textToClean.replace('\n', '')
+    textToClean = " ".join(textToClean.split())
+
+    return textToClean
+
 def extract_category_title(keyPhrasesStartTag):
     print("Extracting category titles from the key phrases blocks...")
-    title = keyPhrasesStartTag.span.span.get_text()
+    if keyPhrasesStartTag.span:
+        title = keyPhrasesStartTag.span.span.get_text()
+        title = remove_newline_and_duplicate_spaces(title)
+    else:
+        title = None
+    
     return title
+
+def get_next_real_sibling(tag):
+    tag = tag.next_sibling
+
+    # Skip over any new line characters.
+    while tag == '\n':
+        tag = tag.next_sibling
+    
+    return tag
+
+def write_sentence_record(writer, sentence_block_tag, category_name: str):
+    if sentence_block_tag is None:
+        return False
+
+    sentence_tag = sentence_block_tag.find('div', class_='ZBgAa')
+    if sentence_tag:
+        sentence = sentence_tag.span.span.get_text()
+    else:
+        # End further processing of the block as no sentence value is present.
+        return False
+
+    translation_tag = sentence_block_tag.find('div', class_='_1F4vM')
+    if translation_tag:
+        translation = translation_tag.span.span.get_text()
+        translation = remove_newline_and_duplicate_spaces(translation)
+
+    data_line = [sentence, translation, 'mp3', '[sound:mp3]', guide_number, category_name]
+    writer.writerow(data_line)
+    return True
 
 def extract_sentence(writer, startTag, category_name: str, guide_number: str):
     print("Extracing sentences from phrase block...")
     possible_sentence_tag = startTag;
 
     while possible_sentence_tag != None:
-        possible_sentence_tag = possible_sentence_tag.next_sibling
+        possible_sentence_tag = get_next_real_sibling(possible_sentence_tag)
         if possible_sentence_tag is None:
             break
         
-        possible_sentence_tag = possible_sentence_tag.next_sibling
+        possible_sentence_tag = get_next_real_sibling(possible_sentence_tag)
         if possible_sentence_tag is None:
             break
 
-        sentence_block_tag = possible_sentence_tag.div
-        if sentence_block_tag is None:
+        cleaned_possible_sentence_tag_contents = [x for x in possible_sentence_tag.contents if x != '\n']
+        total_sentences_in_block = len(cleaned_possible_sentence_tag_contents)
+        sentence_block_tag = cleaned_possible_sentence_tag_contents[0].div
+        keepGoing = write_sentence_record(writer, sentence_block_tag, category_name)
+        
+        # If no sentence could be written, end the loop.
+        if not keepGoing:
             break
 
-        sentence_tag = sentence_block_tag.find('div', class_='ZBgAa')
-        if sentence_tag:
-            sentence = sentence_tag.span.span.get_text()
-        else:
-            # End further processing of the block as no sentence value is present.
-            break
+        # Write the second sentence if present. 
+        if total_sentences_in_block > 1:
+            sentence_block_tag = cleaned_possible_sentence_tag_contents[1].div
+            keepGoing = write_sentence_record(writer, sentence_block_tag, category_name)
 
-        translation_tag = sentence_block_tag.find('div', class_='_1F4vM')
-        if translation_tag:
-            translation = translation_tag.span.span.get_text()
-    
-        data_line = [sentence, translation, 'mp3', '[sound:mp3]', guide_number, category_name]
-        writer.writerow(data_line)
+            # If no sentence could be written, end the loop.
+            if not keepGoing:
+                break
+
+def select_second_next_block_tag(startTag):
+    # The following function jumps 2 tags ahead.
+    category_tag = get_next_real_sibling(startTag)
+    category_tag = get_next_real_sibling(category_tag)
+    return category_tag
 
 def search_for_key_phrase_blocks(soup: BeautifulSoup, output_file_name: str, guide_number: str):
     print("Searching for the key phrases blocks...")
@@ -83,9 +129,10 @@ def search_for_key_phrase_blocks(soup: BeautifulSoup, output_file_name: str, gui
         for tag in parents:
             child = tag.find('span', string=searchtext)
             if child:
-                category_tag = tag.next_sibling.next_sibling
+                category_tag = select_second_next_block_tag(tag)
                 category_title = extract_category_title(category_tag)
-                extract_sentence(writer, category_tag, category_title, guide_number)
+                if category_title:
+                    extract_sentence(writer, category_tag, category_title, guide_number)
 
 # Main program starts here.
 if __name__ == '__main__':
