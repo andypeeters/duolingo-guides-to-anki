@@ -16,15 +16,55 @@
 # along with this program, see LICENSE.
 # If not, see <https://www.gnu.org/licenses/gpl-3.0.txt>.
 
-# Get the media file.
-wget "$1"
+# The option '-f' signifies that an input file is provided.
+if [ "$1" = "-f" ]
+then
+    echo "Processing input file $2 containing several URL's..."
 
-# Remove all parts but the last one from the URL.
-duosource="$1"
-duofile=${duosource##*/}
+    # Read in the file contents.
+    urlList=$(cat $2)
+    
+    # Store the processed items temporarily in an array.
+    processedFiles=()
 
-# Rename the file to the correct MP3.
-echo $duofile
-echo duolingo-$duofile.mp3
-mv $duofile duolingo-$duofile.mp3
+    # Process each line individually.
+    for line in $urlList
+    do
+# TODO: Convert the file download code into a function,
+# TODO: as it is the same code in the 'else' part.
+# TODO: Must still be tested.
 
+        # Get the media file.
+        wget "$line"
+
+        # Remove all parts but the last one from the URL.
+        duosource="$line"
+        duofile=${duosource##*/}
+
+        # Rename the file to the correct MP3.
+        mv $duofile duolingo-$duofile.mp3
+
+        # Add new item to processed items.
+        processedFiles+=("$duofile ++ duolingo-$duofile.mp3")
+    done
+
+    # Output all items of the array.
+    for item in ${processedFiles[@]}
+    do
+        echo $item
+    done
+else
+    echo "Processing a single URL..."
+
+    # Get the media file.
+    wget "$1"
+
+    # Remove all parts but the last one from the URL.
+    duosource="$1"
+    duofile=${duosource##*/}
+
+    # Rename the file to the correct MP3.
+    echo $duofile
+    echo duolingo-$duofile.mp3
+    mv $duofile duolingo-$duofile.mp3
+fi
