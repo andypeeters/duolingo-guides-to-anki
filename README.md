@@ -65,7 +65,7 @@ to make the scripts executable:
 
 The following software must be available on your computer to be able to run the scripts:
 
-- Bash shell, and the wget tool.
+- Bash shell, `cat`, and `wget`.
 - Python 3.
 
 ## Usage
@@ -74,13 +74,8 @@ The following software must be available on your computer to be able to run the 
    just the main HTML page is sufficient.
 2. Open up a terminal window.
 3. Run the scraper with the following command: `python duolingo_scraper.py /path/to/local-file.html`
-4. Go back to the brower, open up the developer tools by pressing F12 and select the **Network** tab.
-5. Click the play icon of an example sentence, look up the corresponding URL in the Developer tools **Network** tab
-   and copy it to the clipboard.
-6. Go back to the terminal and type the following command `duolingo-download.sh`, leave a space and paste in the copied
-   URL. Press Enter and the audio file is being downloaded to disk.
-7. Take the local file name of the audio file and copy it into one of the placeholder field of the generated CSV file.
-8. Repeat steps 5 to 7 for each remaining audio file.
+
+The usage steps of the downloader script are available here: [Description On Using `duolingo-download.sh`](docs/downloadscript.md)
 
 After completing all steps, import the CSV file into Anki and move all audio files the media collection of the Anki
 profile.
@@ -94,8 +89,9 @@ comment or remark. Or just to start a conversation about the project.
 
 GNU General Public License v3.0 or later
 
-See **LICENSE** to see the full text.
+See **[LICENSE](LICENSE)** to see the full text.
 
 ## Changelog
 
-v1.0.0: first packaged release.
+- v1.0.0: first packaged release.
+- v1.1.0: improved `duolingo-download.sh` script.
