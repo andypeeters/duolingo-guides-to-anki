@@ -18,9 +18,9 @@
 
 # Takes in a single URL, downloads it and renames to the proper name.
 # Parameter: $1 = single full URL.
+# Output: string containing the original name of the file and the
+#         renamed version.
 process_url () {
-    echo "Processing URL: $1"
-
     # Get the media file.
     wget "$1"
 
@@ -40,7 +40,7 @@ process_url () {
 # The option '-f' signifies that an input file is provided.
 if [ "$1" = "-f" ]
 then
-    echo "Processing input file $2 containing several URL's..."
+    echo "Processing input file: $2"
 
     # Read in the file contents.
     urlList=$(cat $2)
@@ -51,21 +51,10 @@ then
     # Process each line individually.
     for line in $urlList
     do
-# TODO: Convert the file download code into a function,
-# TODO: as it is the same code in the 'else' part.
-
-        # Get the media file.
-        wget "$line"
-
-        # Remove all parts but the last one from the URL.
-        duosource="$line"
-        duofile=${duosource##*/}
-
-        # Rename the file to the correct MP3.
-        mv $duofile duolingo-$duofile.mp3
+        result=$(process_url "$line")
 
         # Add new item to processed items.
-        processedFiles+=("$duofile ++ duolingo-$duofile.mp3")
+        processedFiles+=("$result")
     done
 
     # Output all items of the array.
@@ -74,6 +63,6 @@ then
         echo $item
     done
 else
-    echo "Processing a single URL..."
+    echo "Processing a single URL: $1"
     process_url "$1"
 fi
