@@ -75,16 +75,5 @@ then
     done
 else
     echo "Processing a single URL..."
-
-    # Get the media file.
-    wget "$1"
-
-    # Remove all parts but the last one from the URL.
-    duosource="$1"
-    duofile=${duosource##*/}
-
-    # Rename the file to the correct MP3.
-    echo $duofile
-    echo duolingo-$duofile.mp3
-    mv $duofile duolingo-$duofile.mp3
+    process_url "$1"
 fi
