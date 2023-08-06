@@ -49,7 +49,7 @@ then
     done
 
     # Output all items of the array.
-    for item in ${processedFiles[@]}
+    for item in "${processedFiles[@]}"
     do
         echo $item
     done
