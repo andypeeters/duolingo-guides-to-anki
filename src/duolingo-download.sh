@@ -16,6 +16,27 @@
 # along with this program, see LICENSE.
 # If not, see <https://www.gnu.org/licenses/gpl-3.0.txt>.
 
+# Takes in a single URL, downloads it and renames to the proper name.
+# Parameter: $1 = single full URL.
+process_url () {
+    echo "Processing URL: $1"
+
+    # Get the media file.
+    wget "$1"
+
+    # Remove all parts but the last one from the URL.
+    duosource="$1"
+    duofile=${duosource##*/}
+
+    # Rename the file to the correct MP3.
+    mv $duofile duolingo-$duofile.mp3
+
+    # Print the new name.
+    echo "$duofile ++ duolingo-$duofile.mp3"
+}
+
+# Main program starts below.
+
 # The option '-f' signifies that an input file is provided.
 if [ "$1" = "-f" ]
 then
@@ -32,7 +53,6 @@ then
     do
 # TODO: Convert the file download code into a function,
 # TODO: as it is the same code in the 'else' part.
-# TODO: Must still be tested.
 
         # Get the media file.
         wget "$line"
