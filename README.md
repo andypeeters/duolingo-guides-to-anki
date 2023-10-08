@@ -28,6 +28,7 @@ At the moment there are 2 scripts:
 
 1. **duolingo-download.sh** is used to download the audio of each example sentence.
 2. **duolingo_scraper.py** extracts the examples sentences and converts the data into a CSV file.
+    The other ***.py** files provide extra functionality for the main script.
 
 ### CSV File Format
 
@@ -48,7 +49,7 @@ First and foremost: the code of the python script is not so good, to say the lea
 crap. But it works for what it needs to do. I have the intention to improve the code quality but that will be for
 later versions.
 
-The scraper cannot download the audio files. That's why a separate script is needed. Additionally, to let the scraper
+The scraper cannot download the audio files (for now). That's why a separate script is needed. Additionally, to let the scraper
 do its job, it needs a local copy of the guide. In other words, it is necessary to save a Duolingo guide to local
 disk first, and then run the scraper on that file.
 
@@ -56,7 +57,7 @@ Next versions of the script(s) will attempt to remove these limitations.
 
 ## Installation
 
-Just copy the scripts into a directory of your choice. And in case of Linux/Unix execute the following command
+Just copy the scripts (include all ***.py** files) into a directory of your choice. And in case of Linux/Unix execute the following command
 to make the scripts executable:
 
 `chmod u+x duolingo-download.sh duolingo_scraper.py`
@@ -95,3 +96,4 @@ See **[LICENSE](LICENSE)** to see the full text.
 
 - v1.0.0: first packaged release.
 - v1.1.0: improved `duolingo-download.sh` script.
+- v1.2.0: refactored some code in the `duolingo_scraper.py` script and fix a scraper bug.
