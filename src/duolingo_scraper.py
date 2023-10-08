@@ -95,21 +95,16 @@ def extract_sentence(writer: csvwriter.CsvWriter, startTag, category_name: str, 
 
         cleaned_possible_sentence_tag_contents = [x for x in possible_sentence_tag.contents if x != '\n']
         total_sentences_in_block = len(cleaned_possible_sentence_tag_contents)
-        sentence_block_tag = cleaned_possible_sentence_tag_contents[0].div
-        keepGoing = process_sentence_record(writer, sentence_block_tag, category_name)
-        
-        # If no sentence could be written, end the loop.
-        if not keepGoing:
-            break
+        print("Number of sentences to extract: ", total_sentences_in_block)
 
-        # Write the second sentence if present. 
-        if total_sentences_in_block > 1:
-            sentence_block_tag = cleaned_possible_sentence_tag_contents[1].div
+        # Loop over the counted number of sentences.
+        for i in range(0, total_sentences_in_block):
+            sentence_block_tag = cleaned_possible_sentence_tag_contents[i].div
             keepGoing = process_sentence_record(writer, sentence_block_tag, category_name)
-
-            # If no sentence could be written, end the loop.
+        
+            # If no sentence could be written, end the for and while loops.
             if not keepGoing:
-                break
+                return
 
 def select_second_next_block_tag(startTag):
     # The following function jumps 2 tags ahead.
