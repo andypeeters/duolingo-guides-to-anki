@@ -17,7 +17,7 @@
 import argparse
 from bs4 import BeautifulSoup
 import re
-import csv
+import csvwriter
 
 def parse_guidefile(guidefile):
     print("Parsing file:", guidefile.name)
@@ -61,7 +61,7 @@ def get_next_real_sibling(tag):
     
     return tag
 
-def write_sentence_record(writer, sentence_block_tag, category_name: str):
+def process_sentence_record(writer: csvwriter.CsvWriter, sentence_block_tag, category_name: str):
     if sentence_block_tag is None:
         return False
 
@@ -77,11 +77,10 @@ def write_sentence_record(writer, sentence_block_tag, category_name: str):
         translation = translation_tag.span.span.get_text()
         translation = remove_newline_and_duplicate_spaces(translation)
 
-    data_line = [sentence, translation, 'mp3', '[sound:mp3]', guide_number, category_name]
-    writer.writerow(data_line)
+    writer.write_sentence_record(sentence, translation, guide_number, category_name)
     return True
 
-def extract_sentence(writer, startTag, category_name: str, guide_number: str):
+def extract_sentence(writer: csvwriter.CsvWriter, startTag, category_name: str, guide_number: str):
     print("Extracing sentences from phrase block...")
     possible_sentence_tag = startTag;
 
@@ -97,7 +96,7 @@ def extract_sentence(writer, startTag, category_name: str, guide_number: str):
         cleaned_possible_sentence_tag_contents = [x for x in possible_sentence_tag.contents if x != '\n']
         total_sentences_in_block = len(cleaned_possible_sentence_tag_contents)
         sentence_block_tag = cleaned_possible_sentence_tag_contents[0].div
-        keepGoing = write_sentence_record(writer, sentence_block_tag, category_name)
+        keepGoing = process_sentence_record(writer, sentence_block_tag, category_name)
         
         # If no sentence could be written, end the loop.
         if not keepGoing:
@@ -106,7 +105,7 @@ def extract_sentence(writer, startTag, category_name: str, guide_number: str):
         # Write the second sentence if present. 
         if total_sentences_in_block > 1:
             sentence_block_tag = cleaned_possible_sentence_tag_contents[1].div
-            keepGoing = write_sentence_record(writer, sentence_block_tag, category_name)
+            keepGoing = process_sentence_record(writer, sentence_block_tag, category_name)
 
             # If no sentence could be written, end the loop.
             if not keepGoing:
@@ -123,16 +122,17 @@ def search_for_key_phrase_blocks(soup: BeautifulSoup, output_file_name: str, gui
     searchtext = re.compile('KEY(.*)PHRASES', re.DOTALL)
     parents = soup.body.find_all('div', class_='_1WCLL')
 
-    with open(output_file_name, 'w', encoding='UTF8') as csv_file:
-        writer = csv.writer(csv_file, dialect='excel', delimiter='\t')
+    writer = csvwriter.CsvWriter(output_file_name)
 
-        for tag in parents:
-            child = tag.find('span', string=searchtext)
-            if child:
-                category_tag = select_second_next_block_tag(tag)
-                category_title = extract_category_title(category_tag)
-                if category_title:
-                    extract_sentence(writer, category_tag, category_title, guide_number)
+    for tag in parents:
+        child = tag.find('span', string=searchtext)
+        if child:
+            category_tag = select_second_next_block_tag(tag)
+            category_title = extract_category_title(category_tag)
+            if category_title:
+                extract_sentence(writer, category_tag, category_title, guide_number)
+    
+    del writer
 
 # Main program starts here.
 if __name__ == '__main__':
