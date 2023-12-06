@@ -1,4 +1,6 @@
-**Note** This repository is archived due to a very simple reason: I don't need these scripts anymore. To avoid
+**Note: this repository is archived!**
+
+This repository is archived due to a very simple reason: I don't need these scripts anymore. To avoid
 any (potential) maintenance issues, I close this repository but will still keep it around for any future
 reference if necessary.
 
